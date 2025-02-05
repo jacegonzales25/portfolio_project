@@ -39,10 +39,8 @@ export const getCertificationById = async (
   }
 };
 
-// Create a new certification
 export const createCertification = async (req: Request, res: Response) => {
-  const { title, issuer, description, issueDate, crendentialId, url } =
-    req.body;
+  const { title, issuer, description, issueDate, credentialId, url } = req.body; // Fix here
   try {
     const newCertification = await prisma.certification.create({
       data: {
@@ -50,7 +48,7 @@ export const createCertification = async (req: Request, res: Response) => {
         issuer,
         description,
         issueDate,
-        crendentialId,
+        credentialId, // Fix here
         url,
       },
     });
@@ -60,12 +58,10 @@ export const createCertification = async (req: Request, res: Response) => {
   }
 };
 
-// Update a certification
 export const updateCertification = async (req: Request, res: Response) => {
   const { id } = req.params;
   const certificationId = parseInt(id);
-  const { title, issuer, description, issueDate, crendentialId, url } =
-    req.body;
+  const { title, issuer, description, issueDate, credentialId, url } = req.body; // Fix here
 
   if (isNaN(certificationId)) {
     res.status(400).json({ error: "Invalid certification ID" });
@@ -80,31 +76,11 @@ export const updateCertification = async (req: Request, res: Response) => {
         issuer,
         description,
         issueDate,
-        crendentialId,
-        url
+        credentialId, // Fix here
+        url,
       },
     });
     res.json(updatedCertification);
-  } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
-  }
-};
-
-// Delete a certification
-export const deleteCertification = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const certificationId = parseInt(id);
-
-  if (isNaN(certificationId)) {
-    res.status(400).json({ error: "Invalid certification ID" });
-    return;
-  }
-
-  try {
-    await prisma.certification.delete({
-      where: { id: certificationId },
-    });
-    res.json({ message: "Certification deleted" });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }

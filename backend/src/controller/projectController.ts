@@ -1,13 +1,11 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from "../prisma/client";
 
 // Get all projects
 export const getAllProjects = async (req: Request, res: Response) => {
   try {
     const projects = await prisma.project.findMany({
-      include: { technologies: { include: { technology: true } } },
+      include: { technologies: { include: { category: true } } },
     });
     res.json(projects);
   } catch (error) {
@@ -27,8 +25,14 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
   try {
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      include: { technologies: { include: { technology: true } } },
-    });
+      include: {
+        technologies: {
+          include: {
+            category: true
+          },
+        },
+      },
+          });
 
     if (!project) {
       res.status(404).json({ error: 'Project not found' });
@@ -59,8 +63,14 @@ export const createProject = async (req: Request, res: Response) => {
           })),
         },
       },
-      include: { technologies: { include: { technology: true } } },
-    });
+      include: {
+        technologies: {
+          include: {
+            category: true, 
+          },
+        },
+      },
+          });
     res.json(newProject);
   } catch (error) {
     res.status(500).json({ error: 'Something went wrong' });
@@ -73,8 +83,12 @@ export const updateProject = async (req: Request, res: Response) => {
   const { title, description, image, githubLink, externalLink, technologies } = req.body;
   try {
     // First, delete existing project-technologies relationships
-    await prisma.projectTechnology.deleteMany({
-      where: { projectId: parseInt(id) },
+    await prisma.technology.deleteMany({
+      where: {
+        projects: {
+          some: { id: parseInt(id) }, // Delete technologies associated with the project
+        },
+      },
     });
 
     // Then, update the project and create new relationships
@@ -92,7 +106,7 @@ export const updateProject = async (req: Request, res: Response) => {
           })),
         },
       },
-      include: { technologies: { include: { technology: true } } },
+      include: { technologies: { include: { category: true } } },
     });
     res.json(updatedProject);
   } catch (error) {
@@ -104,9 +118,14 @@ export const updateProject = async (req: Request, res: Response) => {
 export const deleteProject = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    // First, delete related project-technologies records
-    await prisma.projectTechnology.deleteMany({
-      where: { projectId: parseInt(id) },
+    // First, delete the project-technology associations
+    await prisma.project.update({
+      where: { id: parseInt(id) },
+      data: {
+        technologies: {
+          deleteMany: {}, // Deletes all technologies related to this project
+        },
+      },
     });
 
     // Then, delete the project

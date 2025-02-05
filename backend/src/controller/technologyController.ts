@@ -39,12 +39,12 @@ export const getTechnologyById = async (req: Request, res: Response) => {
 };
 
 export const createTechnology = async (req: Request, res: Response) => {
-  const { name, technologyCategoryId } = req.body;
+  const { name, categoryId } = req.body;
   try {
     const newTechnology = await prisma.technology.create({
       data: {
         name,
-        technologyCategoryId,
+        categoryId,
       },
       include: { category: true },
     });

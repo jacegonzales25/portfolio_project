@@ -15,7 +15,6 @@ export const getAllTecnologyCategories = async (
   }
 };
 
-
 export const getTechnologyCategoryById = async (
   req: Request,
   res: Response
@@ -45,10 +44,7 @@ export const getTechnologyCategoryById = async (
   }
 };
 
-export const createTechnologyCategory = async (
-  req: Request,
-  res: Response
-) => {
+export const createTechnologyCategory = async (req: Request, res: Response) => {
   const { name } = req.body;
   try {
     const newCategory = await prisma.technologyCategory.create({
@@ -63,10 +59,7 @@ export const createTechnologyCategory = async (
   }
 };
 
-export const updateTechnologyCategory = async (
-  req: Request,
-  res: Response
-) => {
+export const updateTechnologyCategory = async (req: Request, res: Response) => {
   const { id } = req.params;
   const categoryId = parseInt(id);
   const { name } = req.body;
@@ -88,10 +81,7 @@ export const updateTechnologyCategory = async (
   }
 };
 
-export const deleteTechnologyCategory = async (
-  req: Request,
-  res: Response
-) => {
+export const deleteTechnologyCategory = async (req: Request, res: Response) => {
   const { id } = req.params;
   const categoryId = parseInt(id);
 
@@ -104,9 +94,8 @@ export const deleteTechnologyCategory = async (
     await prisma.technologyCategory.delete({
       where: { id: categoryId },
     });
-    res.json({ message: "Category deleted" });
-  } catch (error) {
+    res.status(204).send();
+} catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }
 };
-
