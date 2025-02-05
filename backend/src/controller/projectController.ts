@@ -15,23 +15,33 @@ export const getAllProjects = async (req: Request, res: Response) => {
   }
 };
 
-// Get a project by ID
-export const getProjectById = async (req: Request, res: Response) => {
+export const getProjectById = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
+  const projectId = parseInt(id);
+
+  if (isNaN(projectId)) {
+    res.status(400).json({ error: 'Invalid project ID' });
+    return;
+  }
+
   try {
     const project = await prisma.project.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: projectId },
       include: { technologies: { include: { technology: true } } },
     });
+
     if (!project) {
-      return res.status(404).json({ error: 'Project not found' });
+      res.status(404).json({ error: 'Project not found' });
+      return;
     }
+
     res.json(project);
   } catch (error) {
     res.status(500).json({ error: 'Something went wrong' });
   }
 };
 
+  
 // Create a new project
 export const createProject = async (req: Request, res: Response) => {
   const { title, description, image, githubLink, externalLink, technologies } = req.body;
