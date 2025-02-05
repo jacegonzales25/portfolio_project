@@ -43,7 +43,7 @@ model Experience {
   startDate     DateTime
   endDate       DateTime?
   current       Boolean  @default(false)
-  responsibilities String[]
+  responsibilities Json
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -56,4 +56,6 @@ model Certification {
   issueDate   DateTime
   credentialId String?
   url         String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 } 
