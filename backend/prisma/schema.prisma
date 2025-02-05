@@ -10,60 +10,51 @@ datasource db {
 }
 
 model TechnologyCategory {
-  id          Int          @id @default(autoincrement())
-  name        String
+  id           Int          @id @default(autoincrement())
+  name         String
   technologies Technology[]
 }
 
 model Technology {
-  id          Int             @id @default(autoincrement())
-  name        String
-  category    TechnologyCategory @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  projects    ProjectTechnology[]
+  id         Int                @id @default(autoincrement())
+  name       String
+  category   TechnologyCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  projects   Project[]          @relation("ProjectTechnologies")
 }
 
 model Project {
-  id           Int             @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   title        String
   description  String
   image        String?
   githubLink   String
   externalLink String?
-  technologies ProjectTechnology[]
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-}
-
-model ProjectTechnology {
-  project     Project    @relation(fields: [projectId], references: [id])
-  technology  Technology @relation(fields: [technologyId], references: [id])
-  projectId   Int
-  technologyId Int
-
-  @@id([projectId, technologyId])
+  technologies Technology[] @relation("ProjectTechnologies")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model Experience {
-  id            Int      @id @default(autoincrement())
-  company       String
-  title         String
-  startDate     DateTime
-  endDate       DateTime?
-  current       Boolean  @default(false)
+  id               Int       @id @default(autoincrement())
+  company          String
+  title            String
+  startDate        DateTime
+  endDate          DateTime?
+  current          Boolean   @default(false)
   responsibilities String[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Certification {
-  id          Int      @id @default(autoincrement())
-  title       String
-  issuer      String
-  description String
-  issueDate   DateTime
+  id           Int      @id @default(autoincrement())
+  title        String
+  issuer       String
+  description  String
+  issueDate    DateTime
   credentialId String?
-  url         String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-} 
+  url          String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

@@ -1,6 +1,6 @@
-import * as express from "express";
-import * as cors from "cors";
-import * as dotenv from "dotenv";
+import express from 'express';
+import cors from "cors";
+import dotenv from "dotenv";
 import { technologyRouter } from "./routes/technologyRoutes";
 import { projectRouter } from "./routes/projectRoutes";
 
