@@ -86,3 +86,25 @@ export const updateExperience = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 };
+
+
+// Delete an experience
+export const deleteExperience = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const experienceId = parseInt(id);
+
+  if (isNaN(experienceId)) {
+    res.status(400).json({ error: "Invalid experience ID" });
+    return;
+  }
+
+  try {
+    await prisma.experience.delete({
+      where: { id: experienceId },
+    });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+};
+

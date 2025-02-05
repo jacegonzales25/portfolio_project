@@ -40,21 +40,23 @@ export const getCertificationById = async (
 };
 
 export const createCertification = async (req: Request, res: Response) => {
-  const { title, issuer, description, issueDate, credentialId, url } = req.body; // Fix here
+  const { title, issuer, description, issueDate, credentialId, url } = req.body;
+
   try {
     const newCertification = await prisma.certification.create({
       data: {
         title,
         issuer,
         description,
-        issueDate,
-        credentialId, // Fix here
+        issueDate: new Date(issueDate), // Ensure Date format is correct
+        credentialId,
         url,
       },
     });
     res.json(newCertification);
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    console.error("Error creating certification:", error);
+    res.status(500).json({ error: "Something went wrong", details: error });
   }
 };
 
@@ -75,12 +77,32 @@ export const updateCertification = async (req: Request, res: Response) => {
         title,
         issuer,
         description,
-        issueDate,
-        credentialId, // Fix here
+        issueDate: new Date(issueDate),
+        credentialId,
         url,
       },
     });
     res.json(updatedCertification);
+  } catch (error) {
+    console.error("Error updating certification:", error);
+    res.status(500).json({ error: "Something went wrong", details: error });  }
+};
+
+// Delete a certification
+export const deleteCertification = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const certificationId = parseInt(id);
+
+  if (isNaN(certificationId)) {
+    res.status(400).json({ error: "Invalid certification ID" });
+    return;
+  }
+
+  try {
+    await prisma.certification.delete({
+      where: { id: certificationId },
+    });
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }

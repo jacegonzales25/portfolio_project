@@ -55,7 +55,8 @@ export const createTechnologyCategory = async (req: Request, res: Response) => {
     });
     res.json(newCategory);
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Something went wrong", details: error });
+    console.log(error);
   }
 };
 

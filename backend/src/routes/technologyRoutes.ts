@@ -1,11 +1,11 @@
 import express from "express";
 import {
-    getAllTechnologies,
-    getTechnologyById,
-    createTechnology,
-    updateTechnology,
-    deleteTechnology,
-} from '../controller/technologyController';
+  getAllTechnologies,
+  getTechnologyById,
+  createTechnology,
+  updateTechnology,
+  deleteTechnology,
+} from "../controller/technologyController";
 
 const router = express.Router();
 
