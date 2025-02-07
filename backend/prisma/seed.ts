@@ -15,20 +15,23 @@ async function seedTechnologyCategories() {
     "Caching",
     "Version Control & Collaboration",
     "Hosting & Domain Management",
-    "Operating Systems"
+    "Operating Systems",
   ];
 
-  const categories = await prisma.$transaction(
-    categoryNames.map((name) =>
-      prisma.technologyCategory.create({ data: { name } })
-    )
-  );
+  await prisma.technologyCategory.createMany({
+    data: categoryNames.map((name) => ({ name })),
+    skipDuplicates: true, // Avoids duplicate inserts
+  });
 
   console.log("Technology categories seeded.");
-  return categories;
+
+  // Fetch categories to return them for mapping
+  return await prisma.technologyCategory.findMany();
 }
 
 async function seedTechnologies(categories: { name: string; id: number }[]) {
+  const categoryMap = Object.fromEntries(categories.map((c) => [c.name, c.id]));
+
   const technologies = [
     { name: "AWS (EC2, S3, RDS, EKS, Elastic Beanstalk, CloudFront)", category: "Cloud Platforms" },
     { name: "Docker", category: "Containerization & Orchestration" },
@@ -47,40 +50,25 @@ async function seedTechnologies(categories: { name: string; id: number }[]) {
     { name: "CSS", category: "Frontend Development" },
     { name: "JavaScript (TypeScript)", category: "Frontend Development" },
     { name: "Node.js (Express, TypeScript)", category: "Backend Development" },
-    { name: "Python", category: "Backend Development" },
-    { name: "Java", category: "Backend Development" },
-    { name: "PHP", category: "Backend Development" },
     { name: "PostgreSQL (Drizzle, Prisma)", category: "Databases" },
-    { name: "MySQL", category: "Databases" },
-    { name: "MongoDB", category: "Databases" },
-    { name: "Firebase", category: "Databases" },
     { name: "Redis", category: "Caching" },
     { name: "AWS ElastiCache", category: "Caching" },
     { name: "Git", category: "Version Control & Collaboration" },
-    { name: "GitHub", category: "Version Control & Collaboration" },
     { name: "AWS", category: "Hosting & Domain Management" },
     { name: "GoDaddy", category: "Hosting & Domain Management" },
-    { name: "Linux", category: "Operating Systems" }
+    { name: "Linux", category: "Operating Systems" },
   ];
 
-  const categoryMap = Object.fromEntries(
-    categories.map((c) => [c.name, c.id])
-  );
-
-  await prisma.$transaction(
-    technologies.map((tech) =>
-      prisma.technology.create({
-        data: {
-          name: tech.name,
-          categoryId: categoryMap[tech.category],
-        },
-      })
-    )
-  );
+  await prisma.technology.createMany({
+    data: technologies.map((tech) => ({
+      name: tech.name,
+      categoryId: categoryMap[tech.category],
+    })),
+    skipDuplicates: true, // Avoids duplicate inserts
+  });
 
   console.log("Technologies seeded.");
 }
-
 
 async function seedExperiences() {
   const experiences = [
@@ -99,7 +87,7 @@ async function seedExperiences() {
     },
   ];
 
-  await prisma.experience.createMany({ data: experiences });
+  await prisma.experience.createMany({ data: experiences, skipDuplicates: true });
   console.log("Experiences seeded.");
 }
 
@@ -128,73 +116,60 @@ async function seedProjects() {
     where: { name: { in: technologyNames } },
   });
 
-  const technologyMap = Object.fromEntries(
-    technologies.map((t) => [t.name, t.id])
-  );
+  const technologyMap = Object.fromEntries(technologies.map((t) => [t.name, t.id]));
+
+  // Warn if any technologies are missing
+  const missingTechnologies = technologyNames.filter((name) => !technologyMap[name]);
+  if (missingTechnologies.length > 0) {
+    console.warn("Warning: Some technologies were not found in the database:", missingTechnologies);
+  }
 
   const projects = [
     {
       title: "Resume Portfolio",
-      description:
-        "A containerized portfolio showcasing my technical skills and projects.",
+      description: "A containerized portfolio showcasing my technical skills and projects.",
+      // Sample image
+      image: "https://res.cloudinary.com/dk5bvgq20/image/upload/v1633666824/portfolio-website.png",
       githubLink: "https://github.com/jacegonzales/resume-portfolio",
       externalLink: "https://jacegonzales.cloudifyops.xyz",
       technologies: {
-        connect: [
-          { id: technologyMap["Docker"] },
-          { id: technologyMap["Docker Compose"] },
-          {
-            id: technologyMap[
-              "AWS (ECR, Elastic Beanstalk, RDS, S3, Route53 for GoDaddy)"
-            ],
-          },
-          { id: technologyMap["Next.js (Frontend)"] },
-          { id: technologyMap["Redis (Cache)"] },
-          { id: technologyMap["Express (Backend)"] },
-          { id: technologyMap["PostgreSQL (Database)"] },
-          { id: technologyMap["GitHub Actions (CI/CD)"] },
-        ],
+        connect: technologyNames
+          .filter((name) => technologyMap[name])
+          .map((name) => ({ id: technologyMap[name] })),
       },
     },
     {
       title: "Multi-tier Web Application Stack (VPROFILE)",
       description: "A full-stack web app deployed using AWS and Terraform.",
+      image: "https://res.cloudinary.com/dk5bvgq20/image/upload/v1633666824/vprofile-website.png",
       githubLink: "https://github.com/jacegonzales/vprofile",
       externalLink: "https://vprofile.cloudifyops.xyz",
       technologies: {
-        connect: [
-          { id: technologyMap["AWS Elastic Beanstalk (Tomcat, NGINX)"] },
-          { id: technologyMap["RDS"] },
-          { id: technologyMap["S3/EFS"] },
-          { id: technologyMap["ElastiCache"] },
-          { id: technologyMap["Active MQ"] },
-          { id: technologyMap["Route53"] },
-          { id: technologyMap["Cloudfront"] },
-          { id: technologyMap["Terraform"] },
-        ],
+        connect: technologyNames
+          .filter((name) => technologyMap[name])
+          .map((name) => ({ id: technologyMap[name] })),
       },
     },
     {
       title: "Job App Helper",
-      description:
-        "A frontend-only job application assistant tool built with Next.js and Redux.",
+      description: "A frontend-only job application assistant tool built with Next.js and Redux.",
+      image: "https://res.cloudinary.com/dk5bvgq20/image/upload/v1633666824/job-app-helper.png",
       githubLink: "https://github.com/jacegonzales/job-app-helper",
       externalLink: "https://job-app-helper.vercel.app",
       technologies: {
-        connect: [
-          { id: technologyMap["Next.js (Frontend)"] },
-          { id: technologyMap["Redux (State Management)"] },
-        ],
+        connect: technologyNames
+          .filter((name) => technologyMap[name])
+          .map((name) => ({ id: technologyMap[name] })),
       },
     },
   ];
 
-  await prisma.$transaction(
-    projects.map((project) => prisma.project.create({ data: project }))
-  );
+  await prisma.project.createMany({ data: projects, skipDuplicates: true });
 
   console.log("Projects seeded.");
 }
+
+// Write Certification addition here for future
 
 async function main() {
   try {
@@ -208,7 +183,6 @@ async function main() {
     console.log("Database successfully seeded! 🚀");
   } catch (error) {
     console.error("Error seeding database:", error);
-    process.exit(1);
   } finally {
     await prisma.$disconnect();
   }
