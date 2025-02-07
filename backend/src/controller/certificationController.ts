@@ -35,7 +35,7 @@ export const getCertificationById = async (
 
     res.json(certification);
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Something went wrong", details: error });
   }
 };
 
