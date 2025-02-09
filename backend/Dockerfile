@@ -7,6 +7,8 @@ RUN npm install
 
 COPY . .
 
+RUN npx prisma generate
+
 ENV DATABASE_URL=${DATABASE_URL}
 ENV REDIS_URL=${REDIS_URL}
 

@@ -7,5 +7,5 @@ variable "aws_region" {
 variable "s3_bucket_name" {
   description = "S3 bucket name for portfolio images"
   type        = string
-  default     = "resume-app"
+  default     = "resume-portfolio-assets"
 }

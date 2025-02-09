@@ -16,16 +16,15 @@ async function seedTechnologyCategories() {
     "Version Control & Collaboration",
     "Hosting & Domain Management",
     "Operating Systems",
+    "Web Technologies",
   ];
 
   await prisma.technologyCategory.createMany({
     data: categoryNames.map((name) => ({ name })),
-    skipDuplicates: true, // Avoids duplicate inserts
+    skipDuplicates: true,
   });
 
   console.log("Technology categories seeded.");
-
-  // Fetch categories to return them for mapping
   return await prisma.technologyCategory.findMany();
 }
 
@@ -46,14 +45,21 @@ async function seedTechnologies(categories: { name: string; id: number }[]) {
     { name: "Bash", category: "Scripting & Automation" },
     { name: "React (Next.js)", category: "Frontend Development" },
     { name: "Flutter", category: "Frontend Development" },
-    { name: "HTML", category: "Frontend Development" },
-    { name: "CSS", category: "Frontend Development" },
-    { name: "JavaScript (TypeScript)", category: "Frontend Development" },
+    { name: "HTML", category: "Web Technologies" },
+    { name: "CSS", category: "Web Technologies" },
+    { name: "JavaScript (TypeScript)", category: "Web Technologies" },
     { name: "Node.js (Express, TypeScript)", category: "Backend Development" },
+    { name: "Python", category: "Backend Development" },
+    { name: "Java", category: "Backend Development" },
+    { name: "PHP", category: "Backend Development" },
     { name: "PostgreSQL (Drizzle, Prisma)", category: "Databases" },
+    { name: "MySQL", category: "Databases" },
+    { name: "MongoDB", category: "Databases" },
+    { name: "Firebase", category: "Databases" },
     { name: "Redis", category: "Caching" },
     { name: "AWS ElastiCache", category: "Caching" },
     { name: "Git", category: "Version Control & Collaboration" },
+    { name: "GitHub", category: "Version Control & Collaboration" },
     { name: "AWS", category: "Hosting & Domain Management" },
     { name: "GoDaddy", category: "Hosting & Domain Management" },
     { name: "Linux", category: "Operating Systems" },
@@ -64,7 +70,7 @@ async function seedTechnologies(categories: { name: string; id: number }[]) {
       name: tech.name,
       categoryId: categoryMap[tech.category],
     })),
-    skipDuplicates: true, // Avoids duplicate inserts
+    skipDuplicates: true,
   });
 
   console.log("Technologies seeded.");
@@ -92,84 +98,73 @@ async function seedExperiences() {
 }
 
 async function seedProjects() {
-  const technologyNames = [
-    "Docker",
-    "Docker Compose",
-    "AWS (ECR, Elastic Beanstalk, RDS, S3, Route53 for GoDaddy)",
-    "Next.js (Frontend)",
-    "Redis (Cache)",
-    "Express (Backend)",
-    "PostgreSQL (Database)",
-    "GitHub Actions (CI/CD)",
-    "AWS Elastic Beanstalk (Tomcat, NGINX)",
-    "RDS",
-    "S3/EFS",
-    "ElastiCache",
-    "Active MQ",
-    "Route53",
-    "Cloudfront",
-    "Terraform",
-    "Redux (State Management)",
-  ];
-
-  const technologies = await prisma.technology.findMany({
-    where: { name: { in: technologyNames } },
-  });
-
-  const technologyMap = Object.fromEntries(technologies.map((t) => [t.name, t.id]));
-
-  // Warn if any technologies are missing
-  const missingTechnologies = technologyNames.filter((name) => !technologyMap[name]);
-  if (missingTechnologies.length > 0) {
-    console.warn("Warning: Some technologies were not found in the database:", missingTechnologies);
-  }
+  // First, get the technology IDs we need
+  const technologies = await prisma.technology.findMany();
+  const techMap = new Map(technologies.map(tech => [tech.name, tech.id]));
 
   const projects = [
     {
       title: "Resume Portfolio",
       description: "A containerized portfolio showcasing my technical skills and projects.",
-      // Sample image
       image: "https://res.cloudinary.com/dk5bvgq20/image/upload/v1633666824/portfolio-website.png",
       githubLink: "https://github.com/jacegonzales/resume-portfolio",
       externalLink: "https://jacegonzales.cloudifyops.xyz",
       technologies: {
-        connect: technologyNames
-          .filter((name) => technologyMap[name])
-          .map((name) => ({ id: technologyMap[name] })),
+        connect: [
+          "Docker",
+          "Kubernetes (EKS)",
+          "AWS (EC2, S3, RDS, EKS, Elastic Beanstalk, CloudFront)",
+          "React (Next.js)",
+          "Redis",
+          "Node.js (Express, TypeScript)",
+          "PostgreSQL (Drizzle, Prisma)",
+          "GitHub Actions",
+          "Terraform"
+        ].map(techName => ({
+          id: techMap.get(techName)
+        })).filter(tech => tech.id !== undefined)
       },
     },
     {
       title: "Multi-tier Web Application Stack (VPROFILE)",
-      description: "A full-stack web app deployed using AWS and Terraform.",
+      description: "A full-stack web app deployed using AWS and Terraform, achieving significant cost and efficiency improvements.",
       image: "https://res.cloudinary.com/dk5bvgq20/image/upload/v1633666824/vprofile-website.png",
       githubLink: "https://github.com/jacegonzales/vprofile",
       externalLink: "https://vprofile.cloudifyops.xyz",
       technologies: {
-        connect: technologyNames
-          .filter((name) => technologyMap[name])
-          .map((name) => ({ id: technologyMap[name] })),
+        connect: [
+          "AWS (EC2, S3, RDS, EKS, Elastic Beanstalk, CloudFront)",
+          "AWS ElastiCache",
+          "Terraform"
+        ].map(techName => ({
+          id: techMap.get(techName)
+        })).filter(tech => tech.id !== undefined)
       },
     },
     {
       title: "Job App Helper",
-      description: "A frontend-only job application assistant tool built with Next.js and Redux.",
+      description: "A frontend-only job application assistant tool built with Next.js and Redux for state management.",
       image: "https://res.cloudinary.com/dk5bvgq20/image/upload/v1633666824/job-app-helper.png",
       githubLink: "https://github.com/jacegonzales/job-app-helper",
       externalLink: "https://job-app-helper.vercel.app",
       technologies: {
-        connect: technologyNames
-          .filter((name) => technologyMap[name])
-          .map((name) => ({ id: technologyMap[name] })),
+        connect: [
+          "React (Next.js)"
+        ].map(techName => ({
+          id: techMap.get(techName)
+        })).filter(tech => tech.id !== undefined)
       },
     },
   ];
 
-  await prisma.project.createMany({ data: projects, skipDuplicates: true });
+  for (const project of projects) {
+    await prisma.project.create({
+      data: project,
+    });
+  }
 
   console.log("Projects seeded.");
 }
-
-// Write Certification addition here for future
 
 async function main() {
   try {
