@@ -46,9 +46,18 @@ resource "aws_s3_bucket_policy" "portfolio_bucket_policy" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_object" "resume_images" {
-  for_each = fileset("${path.module}/../uploads", "*") # Go up one level to find the uploads folder
+  for_each = fileset("${path.module}/../uploads/photos", "*")
   bucket   = aws_s3_bucket.portfolio_bucket.id
-  key      = "uploads/${each.value}" # Ensuring images are placed inside 'uploads/' in S3
-  source   = "${path.module}/../uploads/${each.value}"
-  etag     = filemd5("${path.module}/../uploads/${each.value}")
+  key      = "uploads/photos/${each.value}"
+  source   = "${path.module}/../uploads/photos/${each.value}"
+  etag     = filemd5("${path.module}/../uploads/photos/${each.value}")
+}
+
+resource "aws_s3_object" "resume_pdf" {
+  bucket              = aws_s3_bucket.portfolio_bucket.id
+  key                 = "uploads/files/Functional Resume - Jace L Gonzales.pdf"
+  source              = "${path.module}/../uploads/files/Functional Resume - Jace L Gonzales.pdf"
+  content_type        = "application/pdf"
+  content_disposition = "attachment; filename=\"Functional_Resume_Jace_L_Gonzales.pdf\""
+  etag                = filemd5("${path.module}/../uploads/files/Functional Resume - Jace L Gonzales.pdf")
 }

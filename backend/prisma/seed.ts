@@ -106,8 +106,8 @@ async function seedProjects() {
     {
       title: "Resume Portfolio",
       description: "A containerized portfolio showcasing my technical skills and projects.",
-      image: "https://res.cloudinary.com/dk5bvgq20/image/upload/v1633666824/portfolio-website.png",
-      githubLink: "https://github.com/jacegonzales/resume-portfolio",
+      image: "https://resume-portfolio-assets.s3.us-east-1.amazonaws.com/uploads/photos/resume.png",
+      githubLink: "https://github.com/jacegonzales25/portfolio_project",
       externalLink: "https://jacegonzales.cloudifyops.xyz",
       technologies: {
         connect: [
@@ -127,9 +127,9 @@ async function seedProjects() {
     },
     {
       title: "Multi-tier Web Application Stack (VPROFILE)",
-      description: "A full-stack web app deployed using AWS and Terraform, achieving significant cost and efficiency improvements.",
-      image: "https://res.cloudinary.com/dk5bvgq20/image/upload/v1633666824/vprofile-website.png",
-      githubLink: "https://github.com/jacegonzales/vprofile",
+      description: "A full-stack web app deployed using AWS, achieving significant cost and efficiency improvements.",
+      image: "https://resume-portfolio-assets.s3.us-east-1.amazonaws.com/uploads/photos/vprofile-cloudifyops.png",
+      githubLink: "https://github.com/jacegonzales25/devops/tree/aws-rearch",
       externalLink: "https://vprofile.cloudifyops.xyz",
       technologies: {
         connect: [
@@ -144,8 +144,8 @@ async function seedProjects() {
     {
       title: "Job App Helper",
       description: "A frontend-only job application assistant tool built with Next.js and Redux for state management.",
-      image: "https://res.cloudinary.com/dk5bvgq20/image/upload/v1633666824/job-app-helper.png",
-      githubLink: "https://github.com/jacegonzales/job-app-helper",
+      image: "https://resume-portfolio-assets.s3.us-east-1.amazonaws.com/uploads/photos/job-app-helper-vercel.png",
+      githubLink: "https://github.com/jacegonzales25/job-app-helper",
       externalLink: "https://job-app-helper.vercel.app",
       technologies: {
         connect: [
