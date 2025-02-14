@@ -28,6 +28,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: List files 
+        run: |
+          ls -R
+
+
       # 4) Build & push the backend image
       - name: Build and push backend
         run: |
@@ -37,5 +42,6 @@ jobs:
       # 5) Build & push the frontend image
       - name: Build and push frontend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest -f frontend/portfolio/Dockerfile frontend
+          docker build \ -t ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest \
+          -f frontend/portfolio/Dockerfile \ frontend/portfolio
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest
