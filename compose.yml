@@ -1,29 +1,30 @@
 services:
   postgres:
+    env_file:
+    - ./backend/.env
+    environment:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      POSTGRES_DB:
     image: postgres:latest
     container_name: postgresDB
     restart: always
-    env_file: 
-     - path: ./backend/.env  # Load environment variables
-       required: true
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+    - pgdata:/var/lib/postgresql/data
     networks:
-      - app-network
+    - app-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      test: [
+        "CMD-SHELL",
+        "PGPASSWORD=$POSTGRES_PASSWORD pg_isready -U $POSTGRES_USER -h 127.0.0.1 -d $POSTGRES_DB || exit 1",
+      ]
       interval: 10s
       retries: 5
       start_period: 10s
 
   backend:
-    env_file: 
-     - path: ./backend/.env  # Load environment variables
-       required: true
+    env_file:
+      - ./backend/.env
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -33,20 +34,64 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: sh -c "npx prisma db push && npx prisma db seed && npm run start"
 
   redis:
-    env_file: 
-     - path: ./backend/.env  # Load environment variables
-       required: true
+    env_file:
+      - ./backend/.env
     image: redis:latest
     container_name: redisService
     restart: always
-    command: redis-server --requirepass ${REDIS_PASSWORD}
+    entrypoint: ["sh", "-c"]
+    command: ["redis-server --requirepass $REDIS_PASSWORD"]
     networks:
       - app-network
     volumes:
       - redisdata:/data
+
+  frontend:
+    env_file:
+      - ./frontend/portfolio/.env
+    build:
+      context: ./frontend/portfolio
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: "http://localhost:8080"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:8080"
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s # Increased to allow for Next.js standalone server startup time
+    depends_on:
+      - backend
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx_proxy
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_started
 
 networks:
   app-network:

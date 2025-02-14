@@ -10,7 +10,7 @@ import { technologyCategoryRouter } from './routes/technologyCategoryRoutes';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 app.use("/technologies", technologyRouter);
@@ -19,7 +19,7 @@ app.use("/experiences", experienceRouter);
 app.use("/certifications", certificationRouter);
 app.use("/technology-categories", technologyCategoryRouter);
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+const PORT = parseInt(process.env.PORT as string, 10) || 8080;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
