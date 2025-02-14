@@ -31,11 +31,11 @@ jobs:
       # 4) Build & push the backend image
       - name: Build and push backend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-backend:latest -f backend/Dockerfile .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-backend:latest -f backend/Dockerfile backend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-backend:latest
 
       # 5) Build & push the frontend image
       - name: Build and push frontend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest -f frontend/portfolio/Dockerfile .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest -f frontend/portfolio/Dockerfile frontend/portfolio
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest
