@@ -1,0 +1,18 @@
+docker pull jacegonzales25/portfolio-frontend:latest
+docker pull jacegonzales25/portfolio-backend:latest
+
+#Tag the images to URI
+docker tag jacegonzales25/portfolio-backend:latest \
+  533267324501.dkr.ecr.us-east-1.amazonaws.com/portfolio-backend:latest
+
+docker tag jacegonzales25/portfolio-frontend:latest \
+  533267324501.dkr.ecr.us-east-1.amazonaws.com/portfolio-frontend:latest
+
+#Authenticate and Login to ECR
+  aws ecr get-login-password --region us-east-1 \
+| docker login --username AWS \
+  --password-stdin 533267324501.dkr.ecr.us-east-1.amazonaws.com
+
+#Push to Docker Hub
+docker push 533267324501.dkr.ecr.us-east-1.amazonaws.com/portfolio-backend:latest
+docker push 533267324501.dkr.ecr.us-east-1.amazonaws.com/portfolio-frontend:latest

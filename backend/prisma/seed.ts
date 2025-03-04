@@ -79,6 +79,19 @@ async function seedTechnologies(categories: { name: string; id: number }[]) {
 async function seedExperiences() {
   const experiences = [
     {
+      company: "Computrade Technology Philippines Inc",
+      title: "Solutions Architect Intern",
+      startDate: new Date("2025-03-01"),
+      current: true,
+      responsibilities: {
+        tasks: [
+          "Completed SAA-C03 AWS Certified Solutions Architect - Associate certification.",
+          "Created an AWS Centric Application for Capstone"
+        ]
+      }
+
+    },
+    {
       company: "Highly Succeed Inc",
       title: "Web Development Intern",
       startDate: new Date("2023-06-01"),
